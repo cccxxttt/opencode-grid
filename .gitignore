@@ -3,3 +3,4 @@ dist/*.map
 *.vsix
 .DS_Store
 Thumbs.db
+AGENTS.md

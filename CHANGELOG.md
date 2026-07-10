@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.5.0] — 2026
+
+### Added
+- **COMSPEC shell proxy** — `tg-shell.cmd` + `tg-proxy.ps1` 将 opencode bash 命令路由到网格单元格
+- **嵌入 HTTP API 服务器** — 默认 7890 端口，`/api/exec` 端点用于命令执行
+- **Setup OpenCode 按钮** — 侧边栏一键配置 opencode `shell` 路径
+- **`_selectedCell` 跟踪** — 侧边栏下拉菜单选择目标单元格，API 自动路由
+- **忙锁机制** — 命令执行时拒绝单元格切换，10 秒空闲自动解锁
+- **`TG_DIR` 动态路径解析** — 解决通过 PATH 调用时 `%~dp0` 回退到 CWD 的问题
+
+### Changed
+- 所有 `terminalGrid` 命名 → `opencodeGrid`
+- 所有 `Terminal Grid` 显示文本 → `OpenCode Grid`
+- 状态栏文本 `TG :${d}` → `OCG :${d}`
+- `H._selectedCell` 默认值 `0` → `-1`（opencode 模式）
+- 侧边栏 `_selectedCell` 默认值 `0` → `-1`
+- 侧边栏下拉菜单使用全局 cell ID（代替局部索引）
+
+### Fixed
+- `selectCell` 处理程序同时位于 GridPanel (class x) 和 Sidebar (class z)
+- `sendConfig()` 现在发送 `cellIds` 和 `selectedCell` 到 webview
+- 侧边栏 webview `updateCellSelector` 使用 `msg.cellIds[i]` 代替局部索引 `i`
+
 ## [0.4.0] - 2026
 
 ### Added
