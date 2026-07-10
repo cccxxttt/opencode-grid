@@ -718,10 +718,26 @@
   </style>
 </head>
 <body>
-  <div class="container"><div style="font-size:11px;opacity:.7;margin-bottom:4px">Target Cell:</div><div style="display:flex;gap:4px;margin-bottom:8px">
-      <select id="ocCellSelect" class="glass-select" style="flex:1;min-width:0">
-        <option value="-1">opencode</option>
-      </select>
+  <div class="container">
+    <div class="glass-card" data-section="targetCell">
+      <div class="section-header collapsible">
+        <div class="section-label">${i.l10n.t("Target Cell")}</div>
+        <span class="tip-wrap">
+          <span class="tip-icon">?</span>
+          <div class="tip-bubble">
+            ${i.l10n.t("Route opencode bash commands to a specific grid cell. Select a cell below, then run commands via opencode — output appears in the chosen terminal.")}
+          </div>
+        </span>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="section-body">
+        <div style="font-size:11px;opacity:.7;margin-bottom:8px">${i.l10n.t("Select which grid cell receives commands from opencode's bash tool.")}</div>
+        <div style="display:flex;gap:4px">
+          <select id="ocCellSelect" class="glass-select" style="flex:1;min-width:0">
+            <option value="-1">opencode</option>
+          </select>
+        </div>
+      </div>
     </div>
     
     
