@@ -1,0 +1,225 @@
+{
+	"name": "opencode-grid",
+	"displayName": "OpenCode Grid",
+	"description": "Split terminals into a grid layout — route opencode shell commands to selected grid cells via COMSPEC proxy + REST API",
+	"version": "0.1.0",
+	"publisher": "cccxxttt",
+	"author": "cccxxttt",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cccxxttt/opencode-grid"
+	},
+	"homepage": "https://github.com/cccxxttt/opencode-grid",
+	"bugs": {
+		"url": "https://github.com/cccxxttt/opencode-grid/issues"
+	},
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"opencode",
+		"terminal",
+		"grid",
+		"split terminal",
+		"multiple terminals",
+		"terminal layout",
+		"terminal grid",
+		"terminal manager",
+		"tmux",
+		"pane",
+		"multi-terminal",
+		"multiplexer",
+		"mcp",
+		"terminal merge",
+		"broadcast",
+		"claude",
+		"codex"
+	],
+	"icon": "images/icon.png",
+	"galleryBanner": {
+		"color": "#1a1a2e",
+		"theme": "dark"
+	},
+	"activationEvents": [
+		"onWebviewPanel:opencodeGrid"
+	],
+	"extensionKind": [
+		"workspace"
+	],
+	"l10n": "./l10n",
+	"main": "./dist/extension.js",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "opencode-grid-container",
+					"title": "OpenCode Grid",
+					"icon": "images/sidebar.svg"
+				}
+			]
+		},
+		"views": {
+			"opencode-grid-container": [
+				{
+					"type": "webview",
+					"id": "opencodeGrid.sidebarView",
+					"name": "OpenCode Grid"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "opencodeGrid.openGrid",
+				"title": "OpenCode Grid: Open Grid"
+			},
+			{
+				"command": "opencodeGrid.openCustomGrid",
+				"title": "OpenCode Grid: Open Custom Grid"
+			},
+			{
+				"command": "opencodeGrid.open2x2",
+				"title": "OpenCode Grid: Open 2x2"
+			},
+			{
+				"command": "opencodeGrid.open2x3",
+				"title": "OpenCode Grid: Open 2x3"
+			},
+			{
+				"command": "opencodeGrid.open3x3",
+				"title": "OpenCode Grid: Open 3x3"
+			},
+			{
+				"command": "opencodeGrid.sendToCell",
+				"title": "OpenCode Grid: Send to Cell"
+			},
+			{
+				"command": "opencodeGrid.readCell",
+				"title": "OpenCode Grid: Read Cell Output"
+			},
+			{
+				"command": "opencodeGrid.getGridInfo",
+				"title": "OpenCode Grid: Get Grid Info"
+			},
+			{
+				"command": "opencodeGrid.testAPI",
+				"title": "OpenCode Grid: Test API"
+			},
+			{
+				"command": "opencodeGrid.copyMcpConfig",
+				"title": "OpenCode Grid: Copy MCP Config"
+			},
+			{
+				"command": "opencodeGrid.registerInOpenCode",
+				"title": "OpenCode Grid: Register MCP in OpenCode"
+			},
+			{
+				"command": "opencodeGrid.newTab",
+				"title": "OpenCode Grid: New Tab"
+			},
+			{
+				"command": "opencodeGrid.duplicateTab",
+				"title": "OpenCode Grid: Duplicate Active Tab"
+			},
+			{
+				"command": "opencodeGrid.closeTab",
+				"title": "OpenCode Grid: Close Active Tab"
+			},
+			{
+				"command": "opencodeGrid.resetCellIds",
+				"title": "OpenCode Grid: Reset Cell IDs (when all tabs closed)"
+			},
+			{
+				"command": "opencodeGrid.resetAllTabs",
+				"title": "OpenCode Grid: Reset All Tabs (clear zombies)"
+			}
+		],
+		"mcpServerDefinitionProviders": [
+			{
+				"id": "opencodeGrid",
+				"label": "OpenCode Grid"
+			}
+		],
+		"configuration": {
+			"title": "OpenCode Grid",
+			"properties": {
+				"opencodeGrid.defaultRows": {
+					"type": "number",
+					"default": 2,
+					"minimum": 1,
+					"maximum": 4,
+					"description": "Default number of rows"
+				},
+				"opencodeGrid.defaultCols": {
+					"type": "number",
+					"default": 3,
+					"minimum": 1,
+					"maximum": 5,
+					"description": "Default number of columns"
+				},
+				"opencodeGrid.zoomPercent": {
+					"type": "number",
+					"default": 100,
+					"minimum": 50,
+					"maximum": 300,
+					"description": "Terminal font zoom percentage (50–300%)"
+				},
+				"opencodeGrid.fontFamily": {
+					"type": "string",
+					"default": "",
+					"description": "Terminal font family override (empty = follow IDE theme)"
+				},
+				"opencodeGrid.backgroundColor": {
+					"type": "string",
+					"default": "",
+					"description": "Terminal background color override (empty = follow IDE theme)"
+				},
+				"opencodeGrid.foregroundColor": {
+					"type": "string",
+					"default": "",
+					"description": "Terminal foreground color override (empty = follow IDE theme)"
+				},
+				"opencodeGrid.colorTheme": {
+					"type": "string",
+					"default": "",
+					"description": "Terminal color theme (empty = follow IDE theme)"
+				},
+				"opencodeGrid.shellType": {
+					"type": "string",
+					"default": "",
+					"description": "Default shell type (empty = auto-detect from OS/environment)"
+				},
+				"opencodeGrid.apiPort": {
+					"type": "number",
+					"default": 7890,
+					"minimum": 0,
+					"maximum": 65535,
+					"description": "HTTP API port for opencode exec bridge (0 = disabled). Restart required."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"compile": "tsc -p ./ && node scripts/build.js",
+		"compile:ext": "tsc -p ./",
+		"compile:webview": "node scripts/build.js",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@modelcontextprotocol/sdk": "^1.29.0",
+		"@types/node": "^25.3.2",
+		"@types/vscode": "^1.80.0",
+		"@xterm/addon-fit": "^0.11.0",
+		"@xterm/xterm": "^6.0.0",
+		"adm-zip": "^0.5.16",
+		"esbuild": "^0.27.3",
+		"typescript": "^5.3.0",
+		"zod": "^4.4.3"
+	},
+	"dependencies": {
+		"node-pty": "^1.1.0"
+	}
+}
