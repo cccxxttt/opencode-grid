@@ -5,7 +5,7 @@
 
 `)}readCell(e,n){if(this._hiddenCells.has(e))return null;let a=this._outputBuffers[e];if(a===void 0)return null;let s=o._stripAnsi(a);return n===void 0?s:n<=0?"":s.split(`
 `).slice(-n).join(`
-`)}getCellCount(){return this._terminals.length}getRows(){return this._rows}getCols(){return this._cols}getCellLabels(){let e=p.getCellLabels(this._tabId),n=this._rows*this._cols;return Array.from({length:n},(a,s)=>e[s]||String(s+1))}sendCellConfig(e,n,a,s,t,r){this._panel.webview.postMessage({type:"cellConfig",id:e,bgColor:n,fgColor:a,fontFamily:s,themeName:t??"",themeColors:r??null})}clearCellOverrides(){this._panel.webview.postMessage({type:"clearCellOverrides"})}sendLabels(){let e=p.getCellLabels(this._tabId);this._panel.webview.postMessage({type:"setLabels",labels:e})}loadCustomFonts(e){for(let n of e){let a=this._readFontBase64(n.path);if(a){let s=$.extname(n.path).toLowerCase();this._panel.webview.postMessage({type:"loadFont",name:n.name,data:a,format:pe[s]||"truetype"})}}}getTabId(){return this._tabId}getCellIds(){return this._cellIds.slice()}reveal(){this._panel.reveal(this._panel.viewColumn??y.ViewColumn.One)}refreshTitle(){if(this._disposed)return;let e=w.entries(),n=e.findIndex(([t])=>t===this._tabId),a=n>=0?n:e.length,s=p.getTabName(this._tabId);this._panel.title=o._formatTitle(this._rows,this._cols,a,s)}_readFontBase64(e){try{return G.readFileSync(e).toString("base64")}catch{return null}}_spawnPty(e,n,a,s,t){let r=this._resolveShell(t);if(e){let b=e.spawn(r.path,r.args,{name:"xterm-256color",cols:n,rows:a,cwd:s,env:process.env});return{onData:m=>{b.onData(m)},write:m=>b.write(m),resize:(m,d)=>b.resize(m,d),kill:()=>b.kill()}}let{spawn:g}=require("child_process"),l=g(r.path,r.args,{cwd:s,env:process.env,windowsHide:!0});return{onData:b=>{l.stdout?.on("data",m=>b(m.toString())),l.stderr?.on("data",m=>b(m.toString()))},write:b=>{l.stdin?.write(b)},resize:()=>{},kill:()=>l.kill()}}_createTerminals(e,n){let a=y.workspace.workspaceFolders?.[0]?.uri.fsPath||process.env.USERPROFILE||process.env.HOME||".",s=this._rows*this._cols,t=o._getNodePty();t||y.window.showWarningMessage(y.l10n.t("node-pty not available. Falling back to basic shell (limited features)."));let r=p.getStartupCommands(this._tabId),g=[];for(let c of r)if(typeof c=="string")g.push(c);else if(c&&typeof c=="object"&&"command"in c){let h=c;for(let S=0;S<(h.count||1);S++)g.push(h.command)}let l=p.getDefaultCommand(this._tabId),b=p.getDefaultSteps(this._tabId),m=e||80,d=n||24,f=y.workspace.getConfiguration("opencodeGrid").get("shellType",""),v=p.getCellOverrides(this._tabId);for(let c=0;c<s;c++){if(this._hiddenCells.has(c)){let D={onData(){},write(){},resize(){},kill(){}};this._terminals.push({id:c,pty:D}),this._outputBuffers[c]="",this._cellShellType[c]="",this._insideLlm[c]=!1,this._csiUMode[c]=!1;continue}let h=v[c]?.shellType||f||"",S=this._spawnPty(t,m,d,a,h||void 0),C=c,I=ce(v,g,b,l,c);this._cellShellType[C]=h,this._insideLlm[C]=!1,this._outputBuffers[C]="",this._csiUMode[C]=!1;let k=!1;S.onData(D=>{this._disposed||(o.CSI_U_ENABLE.test(D)&&(this._csiUMode[C]=!0),o.CSI_U_DISABLE.test(D)&&(this._csiUMode[C]=!1),this._outputBuffers[C]=(this._outputBuffers[C]||"")+D,this._outputBuffers[C].length>o.OUTPUT_BUFFER_SIZE&&(this._outputBuffers[C]=this._outputBuffers[C].slice(-o.OUTPUT_BUFFER_SIZE)),this._panel.webview.postMessage({type:"output",id:C,data:D}),!k&&I.length>0&&(k=!0,this._executeSteps(C,I,this._cellShellType[C]||"")))}),this._terminals.push({id:c,pty:S})}this.sendLabels()}_restartTerminal(e){let n=this._terminals[e];if(!n)return;try{n.pty.kill()}catch{}this._panel.webview.postMessage({type:"reset",id:e});let a=y.workspace.workspaceFolders?.[0]?.uri.fsPath||process.env.USERPROFILE||process.env.HOME||".",s=y.workspace.getConfiguration("opencodeGrid").get("shellType",""),t=p.getCellOverrides(this._tabId),r=t[e]?.shellType||s||"",g=this._spawnPty(o._getNodePty(),80,24,a,r||void 0),l=p.getStartupCommands(this._tabId),b=[];for(let c of l)if(typeof c=="string")b.push(c);else if(c&&typeof c=="object"&&"command"in c){let h=c;for(let S=0;S<(h.count||1);S++)b.push(h.command)}let m=p.getDefaultCommand(this._tabId),d=p.getDefaultSteps(this._tabId),f=ce(t,b,d,m,e);this._cellShellType[e]=r,this._insideLlm[e]=!1;let v=!1;this._outputBuffers[e]="",this._csiUMode[e]=!1,g.onData(c=>{this._disposed||(o.CSI_U_ENABLE.test(c)&&(this._csiUMode[e]=!0),o.CSI_U_DISABLE.test(c)&&(this._csiUMode[e]=!1),this._outputBuffers[e]=(this._outputBuffers[e]||"")+c,this._outputBuffers[e].length>o.OUTPUT_BUFFER_SIZE&&(this._outputBuffers[e]=this._outputBuffers[e].slice(-o.OUTPUT_BUFFER_SIZE)),this._panel.webview.postMessage({type:"output",id:e,data:c}),!v&&f.length>0&&(v=!0,this._executeSteps(e,f,this._cellShellType[e]||"")))}),this._terminals[e]={id:e,pty:g}}static{this.CHUNK_SIZE=4096}static{this.CHUNK_DELAY=10}_chunkedWrite(e,n){if(n.length<=o.CHUNK_SIZE){e.write(n);return}let a=0,s=()=>{if(a>=n.length)return;let t=n.slice(a,a+o.CHUNK_SIZE);a+=o.CHUNK_SIZE,e.write(t),a<n.length&&setTimeout(s,o.CHUNK_DELAY)};s()}async _typeToCell(e,n){let a=this._terminals[e]?.pty;if(a)for(let s of n)a.write(s),await O(20)}static{this.LLM_TYPE_MAX_RETRIES=5}static{this.LLM_ECHO_WAIT=2e3}async _waitForLlmPrompt(e){let n=(this._outputBuffers[e]||"").length,a=Date.now()+ke;for(;Date.now()<a;){await O(Te);let s=this._outputBuffers[e]||"",t=o._stripAnsi(s.slice(n));if(Ie.some(r=>r.test(t)))return!0;if(this._disposed)return!1}return!1}async _typeWithRetry(e,n){let a=this._terminals[e]?.pty;if(!a)return!1;for(let s=0;s<o.LLM_TYPE_MAX_RETRIES;s++){let t=(this._outputBuffers[e]||"").length;await this._typeToCell(e,n);let r=Date.now()+o.LLM_ECHO_WAIT;for(;Date.now()<r;){await O(50);let g=this._outputBuffers[e]||"";if(o._stripAnsi(g.slice(t)).includes(n))return!0;if(this._disposed)return!1}for(let g=0;g<n.length;g++)a.write("\x7F");await O(300)}return!1}async _executeSteps(e,n,a){this._stepGeneration[e]||(this._stepGeneration[e]=0);let s=++this._stepGeneration[e],t=!1;for(let r=0;r<n.length;r++){if(this._disposed||this._stepGeneration[e]!==s)return;let g=n[r];if(g.type==="timeout")await O(g.ms);else if(g.type==="command"){if(r>0&&(t?await this._waitForLlmPrompt(e):n[r-1].type==="command"&&await O(_e)),this._disposed||this._stepGeneration[e]!==s)return;let l=t?de:this._enterSeq(e);t?(await this._typeWithRetry(e,g.input),this._terminals[e]?.pty.write(l)):this._terminals[e]?.pty.write(g.input+l),Q(g.input)&&(t=!0),g.input.trim()==="exit"&&(t=!1),this._insideLlm[e]=t}}}restartCell(e){this._restartTerminal(e)}restartAllCells(){for(let e of this._terminals)this._restartTerminal(e.id)}dispose(){if(this._disposed)return;this._disposed=!0,this._registryListener?.dispose(),w.unregister(this._tabId,this),this._configListener?.dispose();for(let n of this._terminals)try{n.pty.kill()}catch{}this._terminals=[];for(let n of this._pasteImages)try{G.unlinkSync(n)}catch{}this._pasteImages=[],this._panel.dispose(),w.size()===0?(this._context.globalState.update("lastGrid",void 0),this._context.globalState.update("lastTabs",void 0)):o._persistTabs(this._context);let e=w.getActive();e&&(e.reveal(),y.commands.executeCommand("opencodeGrid._refreshSidebar"))}_buildCustomFontCss(){let e=this._context.globalState.get("customFonts",[]),n="";for(let a of e){let s=this._readFontBase64(a.path);if(!s)continue;let t=$.extname(a.path).toLowerCase(),r=pe[t]||"truetype";n+=`@font-face { font-family: '${a.name}'; src: url(data:font/${t.slice(1)};base64,${s}) format('${r}'); font-display: swap; }
+`)}getCellCount(){return this._terminals.length}getRows(){return this._rows}getCols(){return this._cols}getCellLabels(){let e=p.getCellLabels(this._tabId),n=this._rows*this._cols;return Array.from({length:n},(a,s)=>e[s]||String(s+1))}sendCellConfig(e,n,a,s,t,r){this._panel.webview.postMessage({type:"cellConfig",id:e,bgColor:n,fgColor:a,fontFamily:s,themeName:t??"",themeColors:r??null})}clearCellOverrides(){this._panel.webview.postMessage({type:"clearCellOverrides"})}sendLabels(){let e=p.getCellLabels(this._tabId);this._panel.webview.postMessage({type:"setLabels",labels:e})}loadCustomFonts(e){for(let n of e){let a=this._readFontBase64(n.path);if(a){let s=$.extname(n.path).toLowerCase();this._panel.webview.postMessage({type:"loadFont",name:n.name,data:a,format:pe[s]||"truetype"})}}}getTabId(){return this._tabId}getCellIds(){return this._cellIds.slice()}reveal(){this._panel.reveal(this._panel.viewColumn??y.ViewColumn.One)}refreshTitle(){if(this._disposed)return;let e=w.entries(),n=e.findIndex(([t])=>t===this._tabId),a=n>=0?n:e.length,s=p.getTabName(this._tabId);this._panel.title=o._formatTitle(this._rows,this._cols,a,s)}_readFontBase64(e){try{return G.readFileSync(e).toString("base64")}catch{return null}}_spawnPty(e,n,a,s,t){let r=this._resolveShell(t);if(e){let b=e.spawn(r.path,r.args,{name:"xterm-256color",cols:n,rows:a,cwd:s,env:process.env});return{onData:m=>b.onData(m),write:m=>b.write(m),resize:(m,d)=>b.resize(m,d),kill:()=>b.kill()}}let{spawn:g}=require("child_process"),l=g(r.path,r.args,{cwd:s,env:process.env,windowsHide:!0});return{onData:b=>{let f1=m=>b(m.toString()),f2=m=>b(m.toString());l.stdout?.on("data",f1),l.stderr?.on("data",f2);return{dispose(){try{l.stdout&&l.stdout.removeListener("data",f1)}catch(x){}try{l.stderr&&l.stderr.removeListener("data",f2)}catch(x){}}}},write:b=>{l.stdin?.write(b)},resize:()=>{},kill:()=>l.kill()}}_createTerminals(e,n){let a=y.workspace.workspaceFolders?.[0]?.uri.fsPath||process.env.USERPROFILE||process.env.HOME||".",s=this._rows*this._cols,t=o._getNodePty();t||y.window.showWarningMessage(y.l10n.t("node-pty not available. Falling back to basic shell (limited features)."));let r=p.getStartupCommands(this._tabId),g=[];for(let c of r)if(typeof c=="string")g.push(c);else if(c&&typeof c=="object"&&"command"in c){let h=c;for(let S=0;S<(h.count||1);S++)g.push(h.command)}let l=p.getDefaultCommand(this._tabId),b=p.getDefaultSteps(this._tabId),m=e||80,d=n||24,f=y.workspace.getConfiguration("opencodeGrid").get("shellType",""),v=p.getCellOverrides(this._tabId);for(let c=0;c<s;c++){if(this._hiddenCells.has(c)){let D={onData(){},write(){},resize(){},kill(){}};this._terminals.push({id:c,pty:D}),this._outputBuffers[c]="",this._cellShellType[c]="",this._insideLlm[c]=!1,this._csiUMode[c]=!1;continue}let h=v[c]?.shellType||f||"",S=this._spawnPty(t,m,d,a,h||void 0),C=c,I=ce(v,g,b,l,c);this._cellShellType[C]=h,this._insideLlm[C]=!1,this._outputBuffers[C]="",this._csiUMode[C]=!1;let k=!1;S.onData(D=>{this._disposed||(o.CSI_U_ENABLE.test(D)&&(this._csiUMode[C]=!0),o.CSI_U_DISABLE.test(D)&&(this._csiUMode[C]=!1),this._outputBuffers[C]=(this._outputBuffers[C]||"")+D,this._outputBuffers[C].length>o.OUTPUT_BUFFER_SIZE&&(this._outputBuffers[C]=this._outputBuffers[C].slice(-o.OUTPUT_BUFFER_SIZE)),this._panel.webview.postMessage({type:"output",id:C,data:D}),!k&&I.length>0&&(k=!0,this._executeSteps(C,I,this._cellShellType[C]||"")))}),this._terminals.push({id:c,pty:S})}this.sendLabels()}_restartTerminal(e){let n=this._terminals[e];if(!n)return;try{n.pty.kill()}catch{}this._panel.webview.postMessage({type:"reset",id:e});let a=y.workspace.workspaceFolders?.[0]?.uri.fsPath||process.env.USERPROFILE||process.env.HOME||".",s=y.workspace.getConfiguration("opencodeGrid").get("shellType",""),t=p.getCellOverrides(this._tabId),r=t[e]?.shellType||s||"",g=this._spawnPty(o._getNodePty(),80,24,a,r||void 0),l=p.getStartupCommands(this._tabId),b=[];for(let c of l)if(typeof c=="string")b.push(c);else if(c&&typeof c=="object"&&"command"in c){let h=c;for(let S=0;S<(h.count||1);S++)b.push(h.command)}let m=p.getDefaultCommand(this._tabId),d=p.getDefaultSteps(this._tabId),f=ce(t,b,d,m,e);this._cellShellType[e]=r,this._insideLlm[e]=!1;let v=!1;this._outputBuffers[e]="",this._csiUMode[e]=!1,g.onData(c=>{this._disposed||(o.CSI_U_ENABLE.test(c)&&(this._csiUMode[e]=!0),o.CSI_U_DISABLE.test(c)&&(this._csiUMode[e]=!1),this._outputBuffers[e]=(this._outputBuffers[e]||"")+c,this._outputBuffers[e].length>o.OUTPUT_BUFFER_SIZE&&(this._outputBuffers[e]=this._outputBuffers[e].slice(-o.OUTPUT_BUFFER_SIZE)),this._panel.webview.postMessage({type:"output",id:e,data:c}),!v&&f.length>0&&(v=!0,this._executeSteps(e,f,this._cellShellType[e]||"")))}),this._terminals[e]={id:e,pty:g}}static{this.CHUNK_SIZE=4096}static{this.CHUNK_DELAY=10}_chunkedWrite(e,n){if(n.length<=o.CHUNK_SIZE){e.write(n);return}let a=0,s=()=>{if(a>=n.length)return;let t=n.slice(a,a+o.CHUNK_SIZE);a+=o.CHUNK_SIZE,e.write(t),a<n.length&&setTimeout(s,o.CHUNK_DELAY)};s()}async _typeToCell(e,n){let a=this._terminals[e]?.pty;if(a)for(let s of n)a.write(s),await O(20)}static{this.LLM_TYPE_MAX_RETRIES=5}static{this.LLM_ECHO_WAIT=2e3}async _waitForLlmPrompt(e){let n=(this._outputBuffers[e]||"").length,a=Date.now()+ke;for(;Date.now()<a;){await O(Te);let s=this._outputBuffers[e]||"",t=o._stripAnsi(s.slice(n));if(Ie.some(r=>r.test(t)))return!0;if(this._disposed)return!1}return!1}async _typeWithRetry(e,n){let a=this._terminals[e]?.pty;if(!a)return!1;for(let s=0;s<o.LLM_TYPE_MAX_RETRIES;s++){let t=(this._outputBuffers[e]||"").length;await this._typeToCell(e,n);let r=Date.now()+o.LLM_ECHO_WAIT;for(;Date.now()<r;){await O(50);let g=this._outputBuffers[e]||"";if(o._stripAnsi(g.slice(t)).includes(n))return!0;if(this._disposed)return!1}for(let g=0;g<n.length;g++)a.write("\x7F");await O(300)}return!1}async _executeSteps(e,n,a){this._stepGeneration[e]||(this._stepGeneration[e]=0);let s=++this._stepGeneration[e],t=!1;for(let r=0;r<n.length;r++){if(this._disposed||this._stepGeneration[e]!==s)return;let g=n[r];if(g.type==="timeout")await O(g.ms);else if(g.type==="command"){if(r>0&&(t?await this._waitForLlmPrompt(e):n[r-1].type==="command"&&await O(_e)),this._disposed||this._stepGeneration[e]!==s)return;let l=t?de:this._enterSeq(e);t?(await this._typeWithRetry(e,g.input),this._terminals[e]?.pty.write(l)):this._terminals[e]?.pty.write(g.input+l),Q(g.input)&&(t=!0),g.input.trim()==="exit"&&(t=!1),this._insideLlm[e]=t}}}restartCell(e){this._restartTerminal(e)}restartAllCells(){for(let e of this._terminals)this._restartTerminal(e.id)}dispose(){if(this._disposed)return;this._disposed=!0,this._registryListener?.dispose(),w.unregister(this._tabId,this),this._configListener?.dispose();for(let n of this._terminals)try{n.pty.kill()}catch{}this._terminals=[];for(let n of this._pasteImages)try{G.unlinkSync(n)}catch{}this._pasteImages=[],this._panel.dispose(),w.size()===0?(this._context.globalState.update("lastGrid",void 0),this._context.globalState.update("lastTabs",void 0)):o._persistTabs(this._context);let e=w.getActive();e&&(e.reveal(),y.commands.executeCommand("opencodeGrid._refreshSidebar"))}_buildCustomFontCss(){let e=this._context.globalState.get("customFonts",[]),n="";for(let a of e){let s=this._readFontBase64(a.path);if(!s)continue;let t=$.extname(a.path).toLowerCase(),r=pe[t]||"truetype";n+=`@font-face { font-family: '${a.name}'; src: url(data:font/${t.slice(1)};base64,${s}) format('${r}'); font-display: swap; }
 `}return n}_getHtml(){let e=this._panel.webview,n=e.asWebviewUri(y.Uri.joinPath(this._context.extensionUri,"media","gridTerminal.js")),a=e.asWebviewUri(y.Uri.joinPath(this._context.extensionUri,"media","xterm.css")),s=Le(),t=this._buildCustomFontCss();return`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2570,46 +2570,74 @@ probe=`& echo ${marker}:%ERRORLEVEL%`;
 }
 const fullCmd=s+probe;
 const l=typeof e.lineCount=="number"?e.lineCount:void 0;
-const m=(g.readCell(r.localCellId)||"").length;
+const term=g._terminals&&g._terminals[r.localCellId];
+let execRaw="";
+let execDisposable=null;
+if(term&&term.pty&&typeof term.pty.onData==="function"){
+try{execDisposable=term.pty.onData(chunk=>{execRaw+=chunk;})}catch(x){}
+}
+const useFallback=!execDisposable;
+let m=0;
+if(useFallback){m=(g.readCell(r.localCellId)||"").length;}
 if(!g._cellExecBusy)g._cellExecBusy={};
 while(g._cellExecBusy[r.localCellId]){await new Promise(c=>setTimeout(c,50))}
 g._cellExecBusy[r.localCellId]=true;
 try{
+execRaw="";
 try{
-const term=g._terminals&&g._terminals[r.localCellId];
 if(term&&term.write){term.write(fullCmd+g._enterSeq(r.localCellId))}
 else{g.sendToCell(r.localCellId,fullCmd+g._enterSeq(r.localCellId))}
 }catch(x){}
 const cap=t>0?Math.min(t,3600000):3600000;
 let deadline=Date.now()+cap;
-let buf="";
 let exitCode=null;
+const markerRe=new RegExp(`${marker}:(-?\\d+)`);
+if(!useFallback){
+while(Date.now()<deadline){
+let stripped="";
+try{stripped=o._stripAnsi(execRaw)||""}catch(x){stripped=execRaw||""}
+let b=stripped;
+if(l!==void 0&&l>0){b=b.split(`\n`).slice(-l).join(`\n`)}
+const match=b.match(markerRe);
+if(match){exitCode=parseInt(match[1],10);await new Promise(c=>setTimeout(c,200));break}
+deadline=Math.max(deadline,Date.now()+500);
+await new Promise(c=>setTimeout(c,100));
+}
+}else{
+let buf="";
 while(Date.now()<deadline){
 const b=g.readCell(r.localCellId,l)||"";
 if(b.length>buf.length){
 buf=b;
-const re=new RegExp(`${marker}:(-?\\d+)`);
-const match=buf.match(re);
+const match=buf.match(markerRe);
 if(match){exitCode=parseInt(match[1],10);await new Promise(c=>setTimeout(c,200));break}
 }
 deadline=Math.max(deadline,Date.now()+500);
 await new Promise(c=>setTimeout(c,100));
 }
-const raw=(g.readCell(r.localCellId)||"").slice(m);
-if(raw)try{g._panel.webview.postMessage({type:"output",id:r.localCellId,data:raw+"\r\n"})}catch(x){}
-let cleaned=raw;
+}
+let cleaned="";
+if(!useFallback){
+let stripped="";
+try{stripped=o._stripAnsi(execRaw)||""}catch(x){stripped=execRaw||""}
+cleaned=stripped;
+}else{
+cleaned=(g.readCell(r.localCellId)||"").slice(m);
+}
 const lines=cleaned.split(/\r?\n/);
 if(lines.length>0&&lines[0].trim().toLowerCase()===fullCmd.trim().toLowerCase()){lines.shift()}
-const markerRe=new RegExp(`^.*${marker}:-?\\d+.*$`);
-for(let i=lines.length-1;i>=0;i--){if(markerRe.test(lines[i]))lines.splice(i,1)}
+const lineMarkerRe=new RegExp(`^.*${marker}:-?\\d+.*$`);
+for(let i=lines.length-1;i>=0;i--){if(lineMarkerRe.test(lines[i]))lines.splice(i,1)}
 if(lines.length>0){
 const last=lines[lines.length-1].trim();
 if(/^(PS\s+)?[A-Z]:\\.*>$/i.test(last)||/.*@.*:.*[\$#]\s*$/.test(last)||/^[\$#]\s*$/.test(last)){lines.pop()}
 }
 cleaned=lines.join("\n").replace(/^\s*\n/,"").replace(/\n\s*$/,"");
+if(cleaned)try{g._panel.webview.postMessage({type:"output",id:r.localCellId,data:cleaned+"\r\n"})}catch(x){}
 n.writeHead(200);
 n.end(JSON.stringify({output:cleaned,exitCode:exitCode,shell:shellType}));
 }finally{
+if(execDisposable){try{execDisposable.dispose&&execDisposable.dispose()}catch(x){}}
 delete g._cellExecBusy[r.localCellId];
 }
 }catch(x){n.writeHead(200);n.end(JSON.stringify({error:String(x.message||x)}));}

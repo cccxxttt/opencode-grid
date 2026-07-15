@@ -51,7 +51,7 @@ $body = @{ command = $cmd; submit = $true } | ConvertTo-Json -Compress
 try {
     $oldComspec = $env:ComSpec
     $env:ComSpec = "C:\Windows\System32\cmd.exe"
-    $r = Invoke-RestMethod -Uri 'http://127.0.0.1:7890/api/exec' -Method POST -Body $body -ContentType 'application/json' -TimeoutSec 5 -ErrorAction Stop
+    $r = Invoke-RestMethod -Uri 'http://127.0.0.1:7890/api/exec' -Method POST -Body $body -ContentType 'application/json' -TimeoutSec 3600 -ErrorAction Stop
     $env:ComSpec = $oldComspec
 
     if ($r.opencode) {
