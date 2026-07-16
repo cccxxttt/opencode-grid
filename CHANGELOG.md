@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0] — 2026
+
+### Added
+- **多实例隔离** — 端口文件以 VS Code 窗口 PID 为主键 (`win-<vscodePid>-<wsHash>.json`)，消除同一 workspace 多窗口互相覆盖的问题
+- **tg-proxy.ps1 进程链端口发现** — 从 `$PID` 爬父进程链，匹配祖先中的 `vscodeWindowPid`，精准定位当前窗口的 API 服务器，不受端口冲突和文件覆盖影响
+- **端口发现缓存** — 以 opencode 祖先 pid 为 key 缓存端口到 `%TEMP%\tg-port-opencode-<pid>.txt`（TTL 120 秒），连续 shell 调用仅首次爬链
+- **心跳续期** — 扩展每 30 秒更新端口文件 `ts` 字段，代理端据此跳过过期文件
+
+### Fixed
+- **长输出回读**（根因：OUTPUT_BUFFER_SIZE=50000 截断后 `slice(m)` 失效）— `_handleExec` 新增独立 PTY onData 订阅路径，直接捕获输出而不依赖 `_outputBuffers` 全局缓冲区快照，不再受 50000 字符限制
+- **`_spawnPty` child_process 路径** — `onData` 包装器改为返回 disposable，支持独立订阅
+- **`tg-proxy.ps1` `Invoke-RestMethod` 超时** — `TimeoutSec` 从 5 秒增长到 3600 秒，匹配扩展端 1 小时上限
+- **PowerShell `$cmd.Trim()` crash** — `$cmd` 为 `[System.Char]` 时 `.Trim()` 报错，改为 `"$cmd".Trim()`
+
+### Changed
+- 端口文件从 `~/.opencode-grid/api-port-<wsHash>.json` 移至 `~/.opencode-grid/ports/win-<vscodePid>-<wsHash>.json`
+- `deactivate` 清理逻辑改按 `extHostPid` 匹配删除
+
 ## [0.5.0] — 2026
 
 ### Added
