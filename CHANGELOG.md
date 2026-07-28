@@ -7,6 +7,8 @@
 - **tg-proxy.ps1 进程链端口发现** — 从 `$PID` 爬父进程链，匹配祖先中的 `vscodeWindowPid`，精准定位当前窗口的 API 服务器，不受端口冲突和文件覆盖影响
 - **端口发现缓存** — 以 opencode 祖先 pid 为 key 缓存端口到 `%TEMP%\tg-port-opencode-<pid>.txt`（TTL 120 秒），连续 shell 调用仅首次爬链
 - **心跳续期** — 扩展每 30 秒更新端口文件 `ts` 字段，代理端据此跳过过期文件
+- **Custom API 可视化管理** — 侧边栏新增 "Custom API" glass-card，可在 UI 中添加/删除 OpenAI 兼容 API provider（名称、Base URL、API Key、自定义模型），写入 `~/.config/opencode/opencode.json` 并自动备份
+- **Active model 下拉** — 侧边栏自定义模型下拉，切换后写入 opencode `model` 字段
 
 ### Fixed
 - **长输出回读**（根因：OUTPUT_BUFFER_SIZE=50000 截断后 `slice(m)` 失效）— `_handleExec` 新增独立 PTY onData 订阅路径，直接捕获输出而不依赖 `_outputBuffers` 全局缓冲区快照，不再受 50000 字符限制

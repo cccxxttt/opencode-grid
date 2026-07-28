@@ -35,6 +35,15 @@ xcopy /E /I opencode-grid %USERPROFILE%\.vscode\extensions\opencode-grid
 ### 3. 路由命令到单元格
 从侧边栏下拉单元格选择器选择目标单元格 → 在 opencode 中运行命令 → 命令写入所选单元格。
 
+### 4. 添加自定义 API（可选）
+侧边栏 **Custom API** 卡片中点击 "+ Add Provider"，填写：
+- Provider Name（显示名，如 `My Custom GPT`）
+- Base URL（如 `https://api.openai.com/v1` 或 `http://127.0.0.1:11434/v1`）
+- API Key（明文，或用 `{env:VAR_NAME}` / `{file:path}` 引用环境变量/文件）
+- Models（至少一个 Model ID + 显示名）
+
+保存后写入 `~/.config/opencode/opencode.json`（先备份 `.bak`）。在卡片底部 **Active model** 下拉选择默认模型。重启 opencode 进程使配置生效。
+
 ## 文件说明
 
 | 文件 | 作用 |

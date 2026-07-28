@@ -132,11 +132,41 @@
 				"command": "opencodeGrid.resetCellIds",
 				"title": "OpenCode Grid: Reset Cell IDs (when all tabs closed)"
 			},
-			{
-				"command": "opencodeGrid.resetAllTabs",
-				"title": "OpenCode Grid: Reset All Tabs (clear zombies)"
-			}
-		],
+{
+			"command": "opencodeGrid.resetAllTabs",
+			"title": "OpenCode Grid: Reset All Tabs (clear zombies)"
+		},
+		{
+			"command": "opencodeGrid.listCustomProviders",
+			"title": "OpenCode Grid: List Custom Providers",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.addCustomProvider",
+			"title": "OpenCode Grid: Add Custom Provider",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.editCustomProvider",
+			"title": "OpenCode Grid: Edit Custom Provider",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.removeCustomProvider",
+			"title": "OpenCode Grid: Remove Custom Provider",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.setActiveModel",
+			"title": "OpenCode Grid: Set Active Model",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.listAllModels",
+			"title": "OpenCode Grid: List All Models",
+			"enablement": "false"
+		}
+	],
 		"mcpServerDefinitionProviders": [
 			{
 				"id": "opencodeGrid",
