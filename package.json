@@ -3,8 +3,8 @@
 	"displayName": "OpenCode Grid",
 	"description": "Split terminals into a grid layout — route opencode shell commands to selected grid cells via COMSPEC proxy + REST API",
 	"version": "0.1.0",
-	"publisher": "cccxxttt",
-	"author": "cccxxttt",
+	"publisher": "cccxxxttt",
+	"author": "cccxxxttt",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
@@ -164,6 +164,11 @@
 		{
 			"command": "opencodeGrid.listAllModels",
 			"title": "OpenCode Grid: List All Models",
+			"enablement": "false"
+		},
+		{
+			"command": "opencodeGrid.disableShellProxy",
+			"title": "OpenCode Grid: Disable Shell Proxy",
 			"enablement": "false"
 		}
 	],

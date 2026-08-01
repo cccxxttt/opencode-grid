@@ -32,6 +32,11 @@ xcopy /E /I opencode-grid %USERPROFILE%\.vscode\extensions\opencode-grid
 ### 2. 设置 Shell 代理（一次性）
 点击侧边栏 **Setup OpenCode** 按钮，自动写入 `~/.config/opencode/opencode.json` 的 `shell` 路径。
 
+### 2b. 禁用/恢复代理
+- **禁用**：点击 Actions 卡片中的 **Disable Proxy** 按钮，删除 `shell` 字段 → opencode 回到默认 PowerShell（重启生效）
+- **恢复**：再点击 **Setup OpenCode** 按钮写回代理 → 命令回到网格单元格（重启生效）
+- 按钮文案随状态变化：启用时显示 "Disable Proxy"，禁用时显示 "Proxy Disabled"（半透明）
+
 ### 3. 路由命令到单元格
 从侧边栏下拉单元格选择器选择目标单元格 → 在 opencode 中运行命令 → 命令写入所选单元格。
 
