@@ -76,8 +76,7 @@ function Get-AncestorSet($startPid, $maxDepth = 20) {
 }
 
 try {
-    $gridDir = Join-Path $env:USERPROFILE ".opencode-grid"
-    $portsDir = Join-Path $gridDir "ports"
+    $portsDir = Join-Path $PSScriptRoot "data\ports"
     $cwd = (Get-Location).Path
 
     # --- Cache fast path: keyed by opencode ancestor pid ---

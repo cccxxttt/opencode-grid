@@ -109,7 +109,7 @@ opencode A 终端                          opencode B 终端
 | 环节 | 说明 |
 |---|---|
 | `process.ppid` | 扩展宿主的父进程 pid = VS Code 窗口进程 pid。每个窗口唯一，即使打开同一 workspace |
-| 端口文件名 | `win-<vscodeWindowPid>-<workspaceHash>.json`，位于 `~/.opencode-grid/ports/` |
+| 端口文件名 | `win-<vscodeWindowPid>-<workspaceHash>.json`，位于 `<extensionPath>/data/ports/` |
 | 心跳 | 每 30 秒更新 `ts` 字段。代理端跳过超过 2 分钟无跳动的文件 |
 | 缓存 | 以 opencode 进程 pid 为 key，缓存到 `%TEMP%\tg-port-opencode-<pid>.txt`，TTL 120 秒 |
 

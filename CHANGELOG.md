@@ -20,6 +20,7 @@
 ### Changed
 - 端口文件从 `~/.opencode-grid/api-port-<wsHash>.json` 移至 `~/.opencode-grid/ports/win-<vscodePid>-<wsHash>.json`
 - `deactivate` 清理逻辑改按 `extHostPid` 匹配删除
+- **运行时数据目录迁移** — reload-signal 通道 + 端口文件从 `~/.opencode-grid` 移至扩展目录内 `<extensionPath>/data/`（卸载扩展即彻底清除，不再污染用户主目录）；`tg-proxy.ps1` 改用 `$PSScriptRoot` 推导端口目录；旧 `~/.opencode-grid` 目录在激活时自动清理
 
 ## [0.5.0] — 2026
 
