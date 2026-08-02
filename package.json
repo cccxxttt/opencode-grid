@@ -109,14 +109,6 @@
 				"title": "OpenCode Grid: Test API"
 			},
 			{
-				"command": "opencodeGrid.copyMcpConfig",
-				"title": "OpenCode Grid: Copy MCP Config"
-			},
-			{
-				"command": "opencodeGrid.registerInOpenCode",
-				"title": "OpenCode Grid: Register MCP in OpenCode"
-			},
-			{
 				"command": "opencodeGrid.newTab",
 				"title": "OpenCode Grid: New Tab"
 			},
@@ -132,50 +124,44 @@
 				"command": "opencodeGrid.resetCellIds",
 				"title": "OpenCode Grid: Reset Cell IDs (when all tabs closed)"
 			},
-{
-			"command": "opencodeGrid.resetAllTabs",
-			"title": "OpenCode Grid: Reset All Tabs (clear zombies)"
-		},
-		{
-			"command": "opencodeGrid.listCustomProviders",
-			"title": "OpenCode Grid: List Custom Providers",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.addCustomProvider",
-			"title": "OpenCode Grid: Add Custom Provider",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.editCustomProvider",
-			"title": "OpenCode Grid: Edit Custom Provider",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.removeCustomProvider",
-			"title": "OpenCode Grid: Remove Custom Provider",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.setActiveModel",
-			"title": "OpenCode Grid: Set Active Model",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.listAllModels",
-			"title": "OpenCode Grid: List All Models",
-			"enablement": "false"
-		},
-		{
-			"command": "opencodeGrid.disableShellProxy",
-			"title": "OpenCode Grid: Disable Shell Proxy",
-			"enablement": "false"
-		}
-	],
-		"mcpServerDefinitionProviders": [
 			{
-				"id": "opencodeGrid",
-				"label": "OpenCode Grid"
+				"command": "opencodeGrid.resetAllTabs",
+				"title": "OpenCode Grid: Reset All Tabs (clear zombies)"
+			},
+			{
+				"command": "opencodeGrid.listCustomProviders",
+				"title": "OpenCode Grid: List Custom Providers",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.addCustomProvider",
+				"title": "OpenCode Grid: Add Custom Provider",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.editCustomProvider",
+				"title": "OpenCode Grid: Edit Custom Provider",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.removeCustomProvider",
+				"title": "OpenCode Grid: Remove Custom Provider",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.setActiveModel",
+				"title": "OpenCode Grid: Set Active Model",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.listAllModels",
+				"title": "OpenCode Grid: List All Models",
+				"enablement": "false"
+			},
+			{
+				"command": "opencodeGrid.disableShellProxy",
+				"title": "OpenCode Grid: Disable Shell Proxy",
+				"enablement": "false"
 			}
 		],
 		"configuration": {
@@ -238,21 +224,11 @@
 		}
 	},
 	"scripts": {
-		"compile": "tsc -p ./ && node scripts/build.js",
-		"compile:ext": "tsc -p ./",
-		"compile:webview": "node scripts/build.js",
-		"watch": "tsc -watch -p ./"
+		"compile": "echo This extension ships a prebuilt dist/extension.js; no build step required."
 	},
 	"devDependencies": {
-		"@modelcontextprotocol/sdk": "^1.29.0",
 		"@types/node": "^25.3.2",
-		"@types/vscode": "^1.80.0",
-		"@xterm/addon-fit": "^0.11.0",
-		"@xterm/xterm": "^6.0.0",
-		"adm-zip": "^0.5.16",
-		"esbuild": "^0.27.3",
-		"typescript": "^5.3.0",
-		"zod": "^4.4.3"
+		"@types/vscode": "^1.80.0"
 	},
 	"dependencies": {
 		"node-pty": "^1.1.0"
